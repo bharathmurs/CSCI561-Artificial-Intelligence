@@ -38,6 +38,9 @@ public class _5399443653Player extends Player {
 			open.add(node);
 			int p = _pickNeighbours(board, nr, nc, nodes);
 			maxP = Math.max(maxP, p);
+			// Pruning is done here. 
+			// If my score is less than the current encountered opponent score,
+			// then donot expand the further nodes at open queue.
 			if ((myScore * myScore) - (maxP * maxP) < 0) {
 				break;
 			}
@@ -45,7 +48,8 @@ public class _5399443653Player extends Player {
 		}
 		return maxP;
 	}
-
+	
+	// Move the board state after selecting fruit at position (r, c)
 	public int[][] _moveBoard(int[][] board, int r, int c) {
 		pick(board, r, c);
 		for (int i = 0; i < columns; i++) {
@@ -63,11 +67,14 @@ public class _5399443653Player extends Player {
 		return board;
 	}
 
+	// Returns the score after picking up the fruit at
+	// location (r, c)
 	private int pick(int[][] board, int r, int c) {
 		int picked = 0;
 		int color = board[r][c];
 		if (color != -1) {
 			List<Integer> open = new ArrayList<Integer>();
+			// If fruit is not taken, add it to the open queue.
 			open.add(r * columns + c);
 			while (!open.isEmpty()) {
 				int t = open.remove(0);
@@ -90,6 +97,7 @@ public class _5399443653Player extends Player {
 		return picked;
 	}
 
+	// Creates and returns a copy of Gameboard 
 	public static int[][] getACopyOfTheBoard(int[][] b) {
 		int[][] cb = new int[b.length][b[0].length];
 		for (int i = 0; i < b.length; i++)
@@ -99,12 +107,14 @@ public class _5399443653Player extends Player {
 		return cb;
 	}
 
+	// Picks all the neighbours of fruit (r, c) of same fruit type 
 	public static int _pickNeighbours(int[][] board, int r, int c,
 			Collection<Integer> nodes) {
 		int picked = 0;
 		int color = board[r][c];
 		if (color != -1) {
 			List<Integer> open = new ArrayList<Integer>();
+			// Add fruit to the open queue if it is not already taken.
 			open.add(r * columns + c);
 			while (!open.isEmpty()) {
 				int t = open.remove(0);
@@ -139,9 +149,9 @@ public class _5399443653Player extends Player {
 	public int[] findMove(int[][] board, long myTime, long opTime) {
 		int[] m = new int[2];
 		int[][] board_copy = new int[rows][columns];
+		// If I have more than 1 second, go one step ahead of Opponent player.
 		if (myTime > 1000000000l) {
 			count++;
-			// if(true){
 			Map<Integer, Integer> scoreMap = new HashMap<Integer, Integer>();
 			Map<Integer, Integer> opponentScore = new HashMap<Integer, Integer>();
 
@@ -155,6 +165,8 @@ public class _5399443653Player extends Player {
 					nodes.add(i);
 				board_copy[i / columns][i % rows] = board[i / columns][i % rows];
 			}
+			// Loop through all the nodes to get the maximum score that I could get,
+			// by making the opponent choose minimum score in the next chance.
 			while (!nodes.isEmpty()) {
 				node = ((ArrayList<Integer>) nodes).remove(0);
 				nr = node / columns;
@@ -193,7 +205,7 @@ public class _5399443653Player extends Player {
 			m[0] = nm / columns;
 			m[1] = nm % columns;
 		} else if (myTime < 1000000l) {
-
+			// If I have 1 second or less, think Greedy.
 			Map<Integer, Integer> scoreMap = new HashMap<Integer, Integer>();
 			Collection<Integer> nodes = new ArrayList<Integer>();
 			int node = 0;
@@ -225,7 +237,7 @@ public class _5399443653Player extends Player {
 			m[0] = nm / columns;
 			m[1] = nm % columns;
 		} else {
-
+			// Pick some random fruit.
 			m[0] = -1;
 			while (m[0] == -1) {
 				int r = rnd.nextInt(rows);
